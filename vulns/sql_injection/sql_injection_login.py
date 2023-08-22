@@ -21,10 +21,6 @@ def sql_injection_login_api(request, app):
 
     db_result = app.db_helper.execute_read(sql)
 
-    new_sql = f"SELECT user_name, user_birthday FROM users WHERE username='{username}' AND password='{password_hash}"
-
-    new_db_result = app.db_helper.execute_read(new_sql)
-
     user = list(
         map(
             lambda u: {
