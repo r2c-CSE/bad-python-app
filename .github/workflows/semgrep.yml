@@ -4,36 +4,21 @@ on:
   push:
     branches:
     - main
+    - master
     paths:
     - .github/workflows/semgrep.yml
+  schedule:
+  # random HH:MM to avoid a load spike on GitHub Actions at 00:00
+  - cron: 41 15 * * *
 name: Semgrep
 jobs:
-  my_first_job: 
-    name: PipfileLockGeneration
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Generate Pipfile.lock
-        run: |
-          pip install pipenv --user
-          pipenv lock
-      - name: Upload Pipfile as Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: pipfilelock
-          path: Pipfile.lock
-  my_second_job:
-    needs: my_first_job
-    name: Scan
+  semgrep:
+    name: semgrep/ci
     runs-on: ubuntu-20.04
     env:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
     container:
       image: returntocorp/semgrep
     steps:
-      - uses: actions/checkout@v3
-      - name: Download artifact from previous job
-        uses: actions/download-artifact@v3
-        with:
-          name: pipfilelock
-      - run: semgrep ci
+    - uses: actions/checkout@v3
+    - run: semgrep ci
